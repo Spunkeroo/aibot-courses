@@ -235,13 +235,13 @@
   <div class="footer-links">
     <a href="https://aibot.beer">aibot.beer</a>
     <a href="https://aibot.coupons">aibot.coupons</a>
+    <a href="https://stake.com/?c=MyXSehCn" target="_blank" rel="noopener sponsored" style="color:#1475e1;font-size:0.65rem;font-weight:700;text-decoration:none;">Stake.com</a>
+    <a href="https://stake.us/?c=L2a8nG6c" target="_blank" rel="noopener sponsored" style="color:#00c74d;font-weight:600;">Stake.us</a>
+    <a href="https://winna.com/?r=Spunkeroo" target="_blank" rel="noopener sponsored" style="color:#ff5f1f;font-weight:600;">Winna.com</a>
     <a href="https://coinbase.com/join/YAGES3X?src=referral-link" target="_blank" rel="noopener sponsored" style="color:#0052ff;font-weight:600;">Buy Crypto</a>
     <a href="https://shop.ledger.com/?r=0553c9ea1441" target="_blank" rel="noopener sponsored" style="color:#ff5500;font-weight:600;">Secure Crypto</a>
     <a href="https://kalshi.com/sign-up/?referral=6b723b42-d0c9-4421-9b4e-5af4b4c6c42c" target="_blank" rel="noopener sponsored" style="color:#00d084;font-weight:600;">Kalshi</a>
     <a href="https://everyx.io/register?ref=AYHl4YqvjcaX" target="_blank" rel="noopener sponsored" style="color:#a855f7;font-weight:600;">EveryX</a>
-    <a href="https://winna.com/?r=Spunkeroo" target="_blank" rel="noopener sponsored" style="color:#ff5f1f;font-weight:600;">Winna.com</a>
-    <a href="https://stake.us/?c=L2a8nG6c" target="_blank" rel="noopener sponsored" style="color:#00c74d;font-weight:600;">Stake.us</a>
-    <a href="https://stake.com/?c=MyXSehCn" target="_blank" rel="noopener sponsored" style="color:#1475e1;font-size:0.65rem;font-weight:700;text-decoration:none;">Stake.com</a>
     <a href="https://spunk.bet" target="_blank" rel="noopener sponsored" style="color:#ff5f1f;font-weight:600;">Spunk.Bet</a>
     <a href="https://x.com/SpunkArt13" target="_blank" rel="noopener noreferrer">@SpunkArt13</a>
   </div>
@@ -424,106 +424,63 @@ function generateSmartResponse(query) {
   const q = query.toLowerCase();
   const responses = getResponses();
 
-  // Try to match a keyword-based response
+  let bestMatch = null;
+  let bestScore = 0;
   for (const [keywords, response] of responses) {
-    if (keywords.some(k => q.includes(k))) {
-      return response;
+    const score = keywords.filter(k => q.includes(k)).length;
+    if (score > bestScore) { bestScore = score; bestMatch = response; }
+  }
+  if (bestMatch) return bestMatch;
+
+  return generateContextualCourseResponse(query);
+}
+
+function generateContextualCourseResponse(query) {
+  const q = query.toLowerCase();
+
+  // Career-specific learning paths
+  const careers = {
+    'product manager':['Google Project Management Certificate (Coursera)','Reforge (advanced PM)','Lenny\'s Newsletter (free)','Build side projects to demonstrate product thinking'],
+    'ux design':['Google UX Design Certificate (Coursera)','Figma tutorials (free)','Nielsen Norman Group articles (free)','Build 3 case studies for your portfolio'],
+    'marketing':['Google Digital Marketing Certificate (Coursera)','HubSpot Academy (free certifications)','Seth Godin\'s altMBA','Google Analytics certification (free)'],
+    'cyber':['CompTIA Security+ (entry cert)','TryHackMe (hands-on, free tier)','HackTheBox Academy','Professor Messer YouTube (free)'],
+    'devops':['Docker + Kubernetes (KodeKloud)','AWS/Azure/GCP free tier labs','Linux basics (Linux Journey, free)','CI/CD with GitHub Actions'],
+    'mobile':['iOS: Swift + SwiftUI (Hacking with Swift, free)','Android: Kotlin + Jetpack Compose','Flutter: Cross-platform (official docs are excellent)','Build and ship 2 apps to App Store/Play Store'],
+    'game dev':['Unity Learn (free official courses)','Unreal Engine tutorials (free)','CS50G: Game Development (Harvard, free)','Build 3 small games, then one polished game'],
+  };
+  for (const [career, tips] of Object.entries(careers)) {
+    if (q.includes(career) || (career.split(' ').length > 1 && career.split(' ').every(w => q.includes(w)))) {
+      return `**${career.split(' ').map(w=>w[0].toUpperCase()+w.slice(1)).join(' ')} — Learning Path**\n\n**Recommended Resources:**\n${tips.map((t,i)=>`${i+1}. ${t}`).join('\n')}\n\n**Timeline:** 3-6 months of focused study (2-3 hrs/day)\n\n**Job Market Tips:**\n- Build a portfolio proving your skills\n- Contribute to open source or volunteer projects\n- Network on LinkedIn + attend meetups\n- Certifications help for entry-level, portfolio matters more for mid+\n\nWant me to create a week-by-week study plan for this career path?`;
     }
   }
 
-  // Default response
-  return `Great question! Here's what ${BOT_NAME} thinks:\n\n` +
-    `Based on your query about "${query.substring(0, 50)}...", here are some key points:\n\n` +
-    `**1. Overview**\nThis is a topic with several important considerations. Let me break it down for you.\n\n` +
-    `**2. Key Factors**\n- Consider your specific needs and context\n- Research current options and pricing\n- Look at reviews and recommendations from trusted sources\n- Compare at least 3 alternatives before deciding\n\n` +
-    `**3. Recommendation**\nFor the most detailed, personalized answer, upgrade to unlimited ${BOT_NAME} access. Our AI will give you specific, actionable advice tailored to your exact situation.\n\n` +
-    `Want a more specific answer? Try asking with more details about your situation!`;
+  // Platform comparisons
+  if (q.match(/coursera|udemy|edx|skillshare|linkedin learning|pluralsight|masterclass/)) {
+    return `**Online Learning Platform Comparison (2026)**\n\n**Best Overall:** Coursera ($50-80/mo or free audit)\n- University courses (Stanford, Google, IBM certs)\n- Financial aid available (100% free)\n- Best for: Career changers, university-level content\n\n**Best Value:** Udemy (wait for $10-15 sales, never pay full price!)\n- Huge catalog, variable quality\n- Best for: Specific skills, practical projects\n- **Pro Tip:** Sales happen every 2-3 weeks\n\n**Best for Tech:** Pluralsight ($30/mo) or Frontend Masters ($40/mo)\n- Expert instructors, current content\n- Best for: Working developers leveling up\n\n**Best Free:** Khan Academy, freeCodeCamp, MIT OpenCourseWare\n- Legitimately world-class, 100% free\n\n**Best for Creative:** Skillshare ($14/mo)\n- Design, illustration, photography, writing\n\n**My Recommendation:** Start free (Coursera audit + YouTube), buy Udemy courses on sale for specific skills, consider a subscription only when you're committed to a path.`;
+  }
+
+  // Certification questions
+  if (q.match(/certif|credential|accredit|degree|diploma/)) {
+    return `**Certifications That Actually Matter (2026)**\n\n**Tech (Highest ROI):**\n- AWS Solutions Architect ($150, avg +$20K salary)\n- Google Professional Certificates ($50/mo, 3-6 months)\n- CompTIA A+/Network+/Security+ ($350 each, IT entry)\n- PMP (Project Management, $555, avg +$25K salary)\n\n**Data & AI:**\n- Google Data Analytics Certificate\n- IBM Data Science Professional Certificate\n- TensorFlow Developer Certificate ($100)\n\n**Business:**\n- Google Digital Marketing Certificate\n- HubSpot certifications (FREE, marketing/sales)\n- Salesforce Admin (in-demand, good pay)\n\n**Which Certs DON'T Matter:**\n- Most Udemy "certificates" (employers don't care)\n- LinkedIn skill badges (nice to have, not required)\n- Any cert from an unknown provider\n\n**Rule of Thumb:** If a Fortune 500 company issues or recognizes the cert, it matters. Random online course completions rarely do.`;
+  }
+
+  // Language learning
+  if (q.match(/language|spanish|french|japanese|chinese|german|korean|english|esl|speak/)) {
+    return `**Language Learning Guide**\n\n**Best Apps (Ranked):**\n1. **Duolingo** (free) — Good for beginners, gamified\n2. **Pimsleur** ($15/mo) — Best for speaking/listening\n3. **Anki** (free) — Spaced repetition flashcards, most effective long-term\n4. **italki** ($10-30/lesson) — 1-on-1 with native tutors\n5. **Busuu** ($10/mo) — Structured courses + community feedback\n\n**The Method That Actually Works:**\n1. **Month 1-2:** Basics (Duolingo + Pimsleur, 30 min/day)\n2. **Month 3-4:** Grammar (textbook or Busuu, + Anki vocab daily)\n3. **Month 5-6:** Immersion (Netflix in target language, podcasts, news)\n4. **Month 7+:** Speaking practice (italki, language exchange apps)\n\n**Free Resources:**\n- YouTube polyglot channels\n- Netflix + subtitles in target language\n- Language exchange: HelloTalk, Tandem (free)\n- LibriVox: Free audiobooks in many languages\n\n**Timeline to Conversational:** 6-12 months with daily practice (30-60 min).`;
+  }
+
+  // Smart default
+  return `**CourseBot — Your Learning Path Advisor**\n\nI'd love to help you find the right courses for "${query.substring(0,50)}"!\n\n**Here's my general advice:**\n\n**Step 1: Don't Overpay**\n- Start with FREE resources (they're often the best)\n- YouTube, freeCodeCamp, Khan Academy, MIT OCW, Coursera (audit mode)\n- Only pay when you need structure or a certificate\n\n**Step 2: Learn by Doing**\n- Watching tutorials ≠ learning. Build projects.\n- The 70/30 rule: 30% learning, 70% practicing\n- Document everything in a portfolio\n\n**Step 3: Stay Consistent**\n- 30 minutes daily > 5 hours on weekends\n- Track your streak (Duolingo got this right)\n- Find an accountability partner or community\n\n**Try asking me about:**\n- "Best courses for [career/skill]"\n- "Coursera vs Udemy for [topic]"\n- "Free resources for [subject]"\n- "How to learn [language]"\n- "Best certifications for [field]"\n\n**I have detailed learning paths for:** Web dev, data science, AI/ML, UX design, marketing, cybersecurity, mobile dev, game dev, and more!`;
 }
 
 function getResponses() {
-  // Site-specific response templates
   return [
-  [["web", "programming", "coding", "javascript", "python", "developer"], `**Web Development Learning Path (2026)**
-
-**Month 1-2: Foundations**
-- HTML/CSS: freeCodeCamp (free, excellent)
-- JavaScript basics: JavaScript.info (free)
-- Build: 3 static websites
-
-**Month 3-4: Frontend**
-- React: React.dev official tutorial (free)
-- Tailwind CSS (faster styling)
-- Build: A portfolio site + 2 React projects
-
-**Month 5-6: Backend**
-- Node.js + Express: The Odin Project (free)
-- Database: PostgreSQL basics
-- APIs: Build 2 full-stack apps
-
-**Month 7-8: Advanced**
-- TypeScript (required in 2026 job market)
-- Next.js (full-stack React framework)
-- Deploy: Vercel or Netlify
-
-**Month 9+: Job Hunt**
-- Polish portfolio (3-5 best projects)
-- LeetCode (easy problems, 30 min/day)
-- Apply to 5-10 jobs daily
-
-**Free Resources:** freeCodeCamp, The Odin Project, CS50
-**Paid (worth it):** Scrimba ($20/mo), Frontend Masters ($40/mo)`],
-  [["data science", "machine learning", "ai", "ml"], `**Data Science / ML Learning Path**
-
-**Prerequisites:**
-- Python (intermediate level)
-- Basic statistics and linear algebra
-
-**Month 1-2: Python for Data Science**
-- Pandas, NumPy: Kaggle Learn (free, hands-on)
-- Data visualization: Matplotlib + Seaborn
-- Practice: Analyze 3 real datasets on Kaggle
-
-**Month 3-4: Statistics & ML Fundamentals**
-- StatQuest YouTube (BEST for intuition)
-- Andrew Ng's ML Course (Coursera, free to audit)
-- Scikit-learn: Classification, regression, clustering
-
-**Month 5-6: Deep Learning**
-- Fast.ai course (free, practical-first approach)
-- PyTorch or TensorFlow (pick one)
-- Build: Image classifier, NLP project
-
-**Month 7-8: Specialization**
-- NLP: Hugging Face tutorials
-- Computer Vision: OpenCV + deep learning
-- LLMs: Build apps with Claude/OpenAI APIs
-
-**Free: Kaggle Learn, Fast.ai, StatQuest**
-**Paid: DataCamp ($25/mo), Coursera ($50/mo)**`],
-  [["free", "cheap", "budget", "no money"], `**Best Free Learning Resources (2026)**
-
-**Programming:**
-- freeCodeCamp — Full web dev + Python + data science (100% free)
-- The Odin Project — Full-stack web dev curriculum (100% free)
-- CS50 by Harvard — Best intro to CS ever made (free on YouTube/edX)
-
-**Data & AI:**
-- Kaggle Learn — Hands-on data science courses (free)
-- Fast.ai — Practical deep learning (free)
-- Google AI — Machine learning crash course (free)
-
-**General:**
-- MIT OpenCourseWare — Full MIT courses, all subjects (free)
-- Khan Academy — Math, science, economics (free)
-- Coursera — Audit mode lets you take courses free (no certificate)
-
-**YouTube Channels:**
-- 3Blue1Brown (math visualization)
-- Fireship (tech/programming, 100-second explainers)
-- StatQuest (statistics/ML)
-- Traversy Media (web development)
-
-**The Secret:** Free resources are often BETTER than paid ones. You don't need to spend money to learn anything in 2026.`]
+  [["web", "programming", "coding", "javascript", "python", "developer", "software", "frontend", "backend", "fullstack"], `**Web Development Learning Path (2026)**\n\n**Month 1-2: Foundations**\n- HTML/CSS: freeCodeCamp (free)\n- JavaScript: JavaScript.info (free)\n- Build: 3 static websites\n\n**Month 3-4: Frontend**\n- React: React.dev official tutorial (free)\n- Tailwind CSS (faster styling)\n- Build: Portfolio + 2 React projects\n\n**Month 5-6: Backend**\n- Node.js + Express: The Odin Project (free)\n- Database: PostgreSQL\n- Build: 2 full-stack apps\n\n**Month 7-8: Advanced**\n- TypeScript (required in 2026)\n- Next.js (full-stack React)\n\n**Free:** freeCodeCamp, The Odin Project, CS50\n**Paid:** Scrimba ($20/mo), Frontend Masters ($40/mo)`],
+  [["data science", "machine learning", "ai", "ml", "deep learning", "neural", "chatgpt", "llm"], `**Data Science / ML / AI Learning Path**\n\n**Month 1-2:** Python + Pandas + NumPy (Kaggle Learn, free)\n**Month 3-4:** Statistics + ML fundamentals (Andrew Ng's Coursera, free to audit)\n**Month 5-6:** Deep Learning (Fast.ai, free)\n**Month 7-8:** Specialize — NLP, Computer Vision, or LLM apps\n\n**2026 Hot Skills:**\n- Building with LLM APIs (Claude, GPT-4)\n- RAG (Retrieval Augmented Generation)\n- Fine-tuning open-source models\n- AI agents and tool use\n\n**Free:** Kaggle Learn, Fast.ai, StatQuest, Hugging Face courses\n**Paid:** DataCamp ($25/mo), Coursera ($50/mo)`],
+  [["free", "cheap", "budget", "no money", "broke", "afford"], `**Best Free Learning Resources (2026)**\n\n**Programming:** freeCodeCamp, The Odin Project, CS50 (Harvard)\n**Data & AI:** Kaggle Learn, Fast.ai, Google AI\n**University:** MIT OpenCourseWare, Khan Academy, Coursera (audit free)\n**YouTube:** 3Blue1Brown, Fireship, StatQuest, Traversy Media\n\n**Hidden Free Resources:**\n- Your local library → free access to LinkedIn Learning, Kanopy\n- GitHub Education Pack → free tools + courses\n- Coursera Financial Aid → 100% free (apply, always approved)\n- edX audit mode → free access to Harvard, MIT courses\n\n**Truth:** Free resources are often BETTER than paid ones.`],
+  [["business", "entrepreneur", "startup", "side hustle", "income", "money"], `**Business & Entrepreneurship Courses**\n\n**Free:**\n- Y Combinator Startup School (free, excellent)\n- Google Digital Garage (digital marketing basics)\n- HubSpot Academy (marketing, sales, CRM)\n\n**Paid (Worth It):**\n- Seth Godin's altMBA ($4,500 but transformative)\n- Reforge (growth, product, marketing — $2K/year)\n- MasterClass business courses (inspiration, not tactical)\n\n**Side Hustle Learning:**\n1. **Freelancing**: Start on Fiverr/Upwork while learning\n2. **E-commerce**: Shopify free trial + YouTube tutorials\n3. **Content Creation**: Consistency > perfection, start now\n4. **Coding**: Build SaaS products (highest leverage skill)\n\n**Best ROI Skills to Learn:**\n1. Copywriting (sells everything)\n2. Sales (every business needs it)\n3. Coding (build products yourself)\n4. Marketing (get customers for free)`],
+  [["math", "calculus", "algebra", "statistics", "physics", "science", "chemistry", "biology"], `**STEM Learning Resources**\n\n**Math:**\n- Khan Academy (free, covers everything K-12 through college)\n- 3Blue1Brown YouTube (visual intuition for complex math)\n- Paul's Online Math Notes (free, college-level)\n- MIT OCW (full university courses, free)\n\n**Physics:** PBS Space Time, Physics Girl, Walter Lewin lectures\n**Chemistry:** Professor Dave Explains, Tyler DeWitt\n**Biology:** Crash Course Biology, AK Lectures, Ninja Nerd\n**Statistics:** StatQuest (BEST for intuition), Khan Academy\n\n**For College Students:**\n- Chegg Study ($15/mo) for step-by-step solutions\n- Wolfram Alpha ($5/mo) for computation help\n- Symbolab (free) for math problem solving\n- Organic Chemistry Tutor (YouTube, goated)\n\n**Study Method:** Feynman Technique — explain it simply to prove you understand it.`],
+  [["write", "writing", "content", "blog", "copy", "author", "book", "novel"], `**Writing & Content Creation Courses**\n\n**Free:**\n- Purdue OWL (grammar, citations, academic writing)\n- Brandon Sanderson's lectures (YouTube, fiction writing from a bestseller)\n- Google's Technical Writing course (free)\n- Ship 30 for 30 concept (write daily for 30 days)\n\n**Paid:**\n- MasterClass writing courses (Neil Gaiman, Malcolm Gladwell)\n- Copyblogger (copywriting, content marketing)\n- The PARA Method by Tiago Forte (knowledge management)\n\n**Copywriting (Highest ROI writing skill):**\n1. Read "The Boron Letters" by Gary Halbert (free online)\n2. Study AIDA framework (Attention → Interest → Desire → Action)\n3. Rewrite ads you see daily as practice\n4. Start freelancing on Fiverr at $50-100/project\n\n**Daily Practice:** Write 500 words every day. Quality follows quantity.`]
 ];
 }
 
